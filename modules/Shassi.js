@@ -24,7 +24,6 @@ Shassi.prototype.edNemnozhko = function (lev, prav) {
   this.Levoe.write(ls);
   var rs = -speed * prav;
   this.Pravoe.write(rs);
-  print("Left:" + ls + " Right:" + rs);
   clearTimeout(this._sdelaiPozhe); //отмени задание
   var self = this;
   this._sdelaiPozhe = setTimeout(function () {
