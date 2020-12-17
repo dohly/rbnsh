@@ -22,7 +22,6 @@ function poverni_golovy(ugol){
 }
 
 poverni_golovy(pryamo);
-var receiver=require('@amperka/ir-receiver').connect(P3);
 var ultrasonic=require('@amperka/ultrasonic').connect({  trigPin:P12, echoPin:P13});
 
 var lineSensor=require('@amperka/analog-line-sensor');
@@ -92,14 +91,26 @@ function edNemnozhko(lev,prav){
 
 var sdelaiPozhe;
 var item=0;
+
+var handlers={};
+handlers[KEY_VPERED]=function(){edNemnozhko(VPERED,VPERED);};
+handlers[KEY_NAZAD]=function(){edNemnozhko(NAZAD,NAZAD);};
+handlers[KEY_VLEVO]=function(){edNemnozhko(NAZAD,VPERED);};
+handlers[KEY_VPRAVO]=function(){edNemnozhko(VPERED,NAZAD);};
+handlers[PLUS]=function(){poverni_golovy(55);};
+handlers[MINUS]=function(){poverni_golovy(125);};
+handlers[GREEN]=function(){poverni_golovy(pryamo);};
+
+var pult=require('Pult').connect(P3, handlers, true);
+
+
+/*
 receiver.on('receive', function(code){
   print(code); 
   if (code==KEY_VPERED){ //если код, принятый приемником, равен коду кнопки "вперед"
-    menu(item--);
-    //edNemnozhko(VPERED,VPERED);
+    edNemnozhko(VPERED,VPERED);
   } else if (code==KEY_NAZAD){
-    //edNemnozhko(NAZAD,NAZAD);
-    menu(item++);
+    edNemnozhko(NAZAD,NAZAD);    
   } else if (code==KEY_VLEVO){
     edNemnozhko(NAZAD,VPERED);
   } else if (code==KEY_VPRAVO){
@@ -113,6 +124,7 @@ receiver.on('receive', function(code){
   }
 });
 
+*/
 
 var x=0;
 function print_N(){
@@ -146,12 +158,12 @@ function menu(cursor){
 }
 
 
-
+/*
 // настраиваем шину I²C
 PrimaryI2C.setup({sda: SDA, scl: SCL});
 // подключаем библиотеку для работы с графическим дисплеем
 var screen = require("SSD1306").connect(PrimaryI2C, ()=>menu(20));
-
+*/
 
 
 
