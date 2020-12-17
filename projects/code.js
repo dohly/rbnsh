@@ -10,28 +10,17 @@ const PLUS=378132519;
 const MINUS=378134559;
 const GREEN=378126399;
 
-const pryamo=90;
-
-var golova=require('@amperka/servo').connect(P8);
-
-var p_golovi;
-
-function poverni_golovy(ugol){
-  p_golovi=ugol;
- golova.write(p_golovi);
-}
-
-poverni_golovy(pryamo);
-
+var golova=require('Golova').connect();
 var shassi=require('Shassi').connect();
+
 var handlers={};
 handlers[KEY_VPERED]=function(){shassi.edNemnozhko(VPERED,VPERED);};
 handlers[KEY_NAZAD]=function(){shassi.edNemnozhko(NAZAD,NAZAD);};
 handlers[KEY_VLEVO]=function(){shassi.edNemnozhko(NAZAD,VPERED);};
 handlers[KEY_VPRAVO]=function(){shassi.edNemnozhko(VPERED,NAZAD);};
-handlers[PLUS]=function(){poverni_golovy(55);};
-handlers[MINUS]=function(){poverni_golovy(125);};
-handlers[GREEN]=function(){poverni_golovy(pryamo);};
+handlers[PLUS]=function(){golova.Poverni(55);};
+handlers[MINUS]=function(){golova.Poverni(125);};
+handlers[GREEN]=function(){golova.Pryamo();};
 
 var pult=require('Pult').connect(P3, handlers, true);
 
