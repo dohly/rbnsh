@@ -22,109 +22,19 @@ function poverni_golovy(ugol){
 }
 
 poverni_golovy(pryamo);
-var ultrasonic=require('@amperka/ultrasonic').connect({  trigPin:P12, echoPin:P13});
 
-var lineSensor=require('@amperka/analog-line-sensor');
-var leftSensor=lineSensor.connect(A0);
-var rightSensor=lineSensor.connect(A1);
-
-var pravSectors=0;
-var levSectors=0;
-
-var odometer=require('@amperka/digital-line-sensor');
-var levOdometer=odometer.connect(P11);
-levOdometer.on('white', function(){
-  levSectors++;
-});
-
-var pravOdometer=odometer.connect(P10);
-pravOdometer.on('white', function(){
-  pravSectors++;
-});
-
-var koleco=require('@amperka/motor');
-var levoe_koleco=koleco.connect(koleco.MotorShield.M1);
-var pravoe_koleco=koleco.connect(koleco.MotorShield.M2);
-
-var pid=require('@amperka/pid').create({
-  target:0,
-  kp:2,
-  ki:0.5,
-  kd:5,
-  outputMin:-1,
-  outputMax: 1
-});
-
-pid.run(function(){
-  if (factSpeed!=0){
-  var diff=levSectors-pravSectors;
-  var correction=pid.update(diff);
-  levoe_koleco.write(speed-correction);
-  pravoe_koleco.write(speed+correction);}
-}, 0.02);
-
-const uskorenie=0.05;
-const startSpeed=0.2;
-
-var speed=startSpeed;
-var factSpeed=0;
-
-function stop(){
-  print('stop');
-  speed=startSpeed;
-  factSpeed=0;
-  levoe_koleco.write(0);
-  pravoe_koleco.write(0);
-}
-
-function edNemnozhko(lev,prav){
-  speed=Math.min(1, speed+uskorenie);
-  factSpeed=speed;
-  var ls=speed*lev;
-    levoe_koleco.write(ls);
-  var rs=-speed*prav;
-    pravoe_koleco.write(rs);
-  print('Left:'+ls+' Right:'+ rs);
-    clearTimeout(sdelaiPozhe);//отмени задание
-    sdelaiPozhe=setTimeout(stop, 200);// даем задание - останови колеса чуть позже
-}
-
-var sdelaiPozhe;
-var item=0;
-
+var shassi=require('Shassi').connect();
 var handlers={};
-handlers[KEY_VPERED]=function(){edNemnozhko(VPERED,VPERED);};
-handlers[KEY_NAZAD]=function(){edNemnozhko(NAZAD,NAZAD);};
-handlers[KEY_VLEVO]=function(){edNemnozhko(NAZAD,VPERED);};
-handlers[KEY_VPRAVO]=function(){edNemnozhko(VPERED,NAZAD);};
+handlers[KEY_VPERED]=function(){shassi.edNemnozhko(VPERED,VPERED);};
+handlers[KEY_NAZAD]=function(){shassi.edNemnozhko(NAZAD,NAZAD);};
+handlers[KEY_VLEVO]=function(){shassi.edNemnozhko(NAZAD,VPERED);};
+handlers[KEY_VPRAVO]=function(){shassi.edNemnozhko(VPERED,NAZAD);};
 handlers[PLUS]=function(){poverni_golovy(55);};
 handlers[MINUS]=function(){poverni_golovy(125);};
 handlers[GREEN]=function(){poverni_golovy(pryamo);};
 
 var pult=require('Pult').connect(P3, handlers, true);
 
-
-/*
-receiver.on('receive', function(code){
-  print(code); 
-  if (code==KEY_VPERED){ //если код, принятый приемником, равен коду кнопки "вперед"
-    edNemnozhko(VPERED,VPERED);
-  } else if (code==KEY_NAZAD){
-    edNemnozhko(NAZAD,NAZAD);    
-  } else if (code==KEY_VLEVO){
-    edNemnozhko(NAZAD,VPERED);
-  } else if (code==KEY_VPRAVO){
-    edNemnozhko(VPERED,NAZAD);
-  } else if (code==PLUS){    
-    poverni_golovy(55);
-  } else if (code==MINUS){
-    poverni_golovy(125);
-  } else if (code==GREEN){
-    poverni_golovy(pryamo);
-  }
-});
-
-*/
 
 var x=0;
 function print_N(){
@@ -165,5 +75,24 @@ PrimaryI2C.setup({sda: SDA, scl: SCL});
 var screen = require("SSD1306").connect(PrimaryI2C, ()=>menu(20));
 */
 
+/*
+var ultrasonic=require('@amperka/ultrasonic').connect({  trigPin:P12, echoPin:P13});
 
+var lineSensor=require('@amperka/analog-line-sensor');
+var leftSensor=lineSensor.connect(A0);
+var rightSensor=lineSensor.connect(A1);
 
+var pravSectors=0;
+var levSectors=0;
+
+var odometer=require('@amperka/digital-line-sensor');
+var levOdometer=odometer.connect(P11);
+levOdometer.on('white', function(){
+  levSectors++;
+});
+
+var pravOdometer=odometer.connect(P10);
+pravOdometer.on('white', function(){
+  pravSectors++;
+});
+*/
