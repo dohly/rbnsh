@@ -6,6 +6,11 @@ const MINUS = 378134559;
 const GREEN = 378126399;
 const PLAY= 378091719;
 
+const KEY_VPERED=378101919;
+const KEY_NAZAD=378124359;
+const KEY_VPRAVO=378116199;
+const KEY_VLEVO=378081519;
+
 var golova = require("Golova").connect();
 var shassi = require("Shassi").connect();
 
