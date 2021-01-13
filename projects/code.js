@@ -12,7 +12,7 @@ const KEY_VPRAVO=378116199;
 const KEY_VLEVO=378081519;
 
 var golova = require("Golova").connect();
-var shassi = require("Shassi").connect();
+var shassi = require("Shassi").connect(); 
 
 var handlers = {};
 handlers[KEY_VPERED] = function () {
@@ -64,7 +64,7 @@ handlers[PLAY]=function(){
     screen.drawString("=(", 0, 0);
   }
   screen.flip();
-};
+}; 
 
 var pult = require("Pult").connect(P3, handlers, true);
 var menuLib = require("Menu");
