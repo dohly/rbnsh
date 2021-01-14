@@ -5,7 +5,7 @@
     "ENV_ON_CONNECT": true,
     "MODULE_URL": "http://js.amperka.ru/modules",
     "MODULE_EXTENSIONS": ".min.js|.js",
-    "MODULE_AS_FUNCTION": false,
+    "MODULE_AS_FUNCTION": true,
     "MODULE_PROXY_ENABLED": false,
     "MODULE_PROXY_URL": "",
     "MODULE_PROXY_PORT": "",

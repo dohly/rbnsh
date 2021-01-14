@@ -80,7 +80,7 @@ handlers[PLAY] = function () {
   screen.flip();
 };
 
-var pult = require("Pult").connect(P3, handlers, true);
+var pult = require("Pult").connect(P3, handlers, false);
 var menuLib = require("Menu");
 var menu;
 var y_strelki = 20;
