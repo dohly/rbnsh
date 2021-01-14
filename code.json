@@ -5,7 +5,7 @@
     "ENV_ON_CONNECT": true,
     "MODULE_URL": "http://js.amperka.ru/modules",
     "MODULE_EXTENSIONS": ".min.js|.js",
-    "MODULE_AS_FUNCTION": true,
+    "MODULE_AS_FUNCTION": false,
     "MODULE_PROXY_ENABLED": false,
     "MODULE_PROXY_URL": "",
     "MODULE_PROXY_PORT": "",
@@ -26,7 +26,7 @@
     "SAVE_ON_SEND": 0,
     "SAVE_STORAGE_FILE": "myapp",
     "LOAD_STORAGE_FILE": 2,
-    "SET_TIME_ON_WRITE": true,
+    "SET_TIME_ON_WRITE": false,
     "SERIAL_THROTTLE_SEND": false
   },
   "ports": [],
