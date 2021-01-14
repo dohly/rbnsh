@@ -1,0 +1,28 @@
+{
+  "name": "rbnsh",
+  "version": "1.0.0",
+  "description": "![](https://i.ibb.co/X2Wq6TD/2021-01-13-22-48-53.png)",
+  "private": true,
+  "dependencies": {
+    
+  },
+  "devDependencies": {
+    "typescript": "^4.1.3",
+    "ts-loader": "^8.0.14",
+    "webpack-cli": "^4.3.1",
+    "webpack": "^5.14.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dohly/rbnsh.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dohly/rbnsh/issues"
+  },
+  "homepage": "https://github.com/dohly/rbnsh#readme"
+}
