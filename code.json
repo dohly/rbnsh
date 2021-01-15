@@ -32,5 +32,5 @@
   "ports": [],
   "config": {},
   "storageContents": {},
-  "file": "code.js"
+  "file": "firmware/code.js"
 }

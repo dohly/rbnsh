@@ -9,7 +9,7 @@ module.exports = merge(common, {
     {
       apply: (compiler) => {
         compiler.hooks.afterEmit.tap("AfterEmitPlugin", (compilation) => {
-          exec("espruino -j code.json code.js", (err, stdout, stderr) => {
+          exec("espruino -j code.json", (err, stdout, stderr) => {
             if (stdout) process.stdout.write(stdout);
             if (stderr) process.stderr.write(stderr);
             if (err) process.stderr.write(err);

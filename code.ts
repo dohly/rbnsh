@@ -91,7 +91,7 @@ var y_strelki = 20;
 function vopros() {
   oled.clear();
   oled.drawString("KAK DELA?", 0, 0);
-  oled.drawString("XOPOSHO", 20, 20);
+  oled.drawString("VESELO", 20, 20);
   oled.drawString("TAK SEBE", 20, 40);
   oled.drawString(">", 0, y_strelki);
   oled.flip();

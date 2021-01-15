@@ -17,6 +17,6 @@ module.exports = {
   },
   output: {
     filename: "code.js",
-    path: path.resolve(__dirname),
+    path: path.resolve(__dirname, 'firmware'),
   }
 };
