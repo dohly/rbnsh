@@ -1,9 +1,10 @@
 const path = require('path');
+const exec = require('child_process').exec;
 
 module.exports = {
   mode: 'development',
   devtool: false,
-  entry: './src/index.ts',
+  entry: './code.ts',
   module: {
     rules: [
       {
@@ -17,7 +18,21 @@ module.exports = {
     extensions: [ '.ts', '.js' ],
   },
   output: {
-    filename: 'bundle.js',
-    path: path.resolve(__dirname, 'dist'),
+    filename: 'code.js',
+    path: path.resolve(__dirname),
   },
+  plugins: [    
+
+    {
+      apply: (compiler) => {
+        compiler.hooks.afterEmit.tap('AfterEmitPlugin', (compilation) => {
+          exec('espruino -j code.json code.js', (err, stdout, stderr) => {
+            if (stdout) process.stdout.write(stdout);
+            if (stderr) process.stderr.write(stderr);
+            if (err) process.stderr.write(err);
+          });
+        });
+      }
+    }
+  ]
 };
