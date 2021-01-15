@@ -1,5 +1,8 @@
-const VPERED = -1;
-const NAZAD = 1;
+const VPERED = 6;
+const NAZAD = -6;
+
+const VPERED_SLOW = 1;
+const NAZAD_SLOW = -1;
 
 const PLUS = 378132519;
 const MINUS = 378134559;
@@ -37,15 +40,15 @@ handlers[KEY_NAZAD] = function () {
       y_strelki = 20;
     }
     vopros();
-  }else{
+  } else {
     shassi.edNemnozhko(NAZAD, NAZAD);
   }
 };
 handlers[KEY_VLEVO] = function () {
-  shassi.edNemnozhko(NAZAD, VPERED);
+  shassi.edNemnozhko(NAZAD_SLOW, VPERED_SLOW);
 };
 handlers[KEY_VPRAVO] = function () {
-  shassi.edNemnozhko(VPERED, NAZAD);
+  shassi.edNemnozhko(VPERED_SLOW, NAZAD_SLOW);
 };
 handlers[PLUS] = function () {
   golova.Poverni(55);
@@ -72,10 +75,10 @@ handlers[PLAY] = function () {
     };
 
     screen.drawImage(img, 0, 0);
-    dontRun=false;
+    dontRun = false;
   } else {
     screen.drawString("=(", 0, 0);
-    dontRun=false;
+    dontRun = false;
   }
   screen.flip();
 };
