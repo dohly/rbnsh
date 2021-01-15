@@ -1,5 +1,5 @@
 var Pult = function (pin, handlers, show_code) { // handlers - словарь с обработчиками
-  var receiver = require("@amperka/ir-receiver").connect(pin);
+  var receiver = __non_webpack_require__("@amperka/ir-receiver").connect(pin);
   receiver.on("receive", function (code) {
     if (show_code) {
       print(code);

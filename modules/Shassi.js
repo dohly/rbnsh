@@ -11,7 +11,7 @@ var counter = function (pin, callback) {
 };
 
 var Shassi = function () {
-  var koleco = require("@amperka/motor");
+  var koleco = __non_webpack_require__("@amperka/motor");
   var self = this;
   this.RightTicks = 0;
   this.LeftTicks = 0;

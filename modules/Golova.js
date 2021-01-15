@@ -1,6 +1,6 @@
 const pryamo = 90;
 var Golova = function () {
-  this._servo = require("@amperka/servo").connect(P8);
+  this._servo = __non_webpack_require__("@amperka/servo").connect(P8);
   this._servo.write(pryamo);
 };
 
