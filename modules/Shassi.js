@@ -1,8 +1,28 @@
 const uskorenie = 0.05;
 const startSpeed = 0.2;
 
-var Shassi = function () {
+var counter = function(pin, callback) {
+  this._pin = pin;
+  this._pin.mode('input');
+  var self = this;
+  setWatch(
+    callback,
+    this._pin,
+    {
+      repeat: true,
+      edge: 'rising',
+      debounce: 10
+    }
+  );
+};
+
+var Shassi = function (debug) {
   var koleco = require("@amperka/motor");
+  var self=this;
+  this.RightTicks=0;
+  this.LeftTicks=0;
+  this.RightCounter=new counter(P10, function(){self.RightTicks++;})
+  this.LeftCounter=new counter(P11, function(){self.LeftTicks++;})
   this._speed = startSpeed;
   this._factSpeed = 0;
   this.Levoe = koleco.connect(koleco.MotorShield.M1);
@@ -31,6 +51,6 @@ Shassi.prototype.edNemnozhko = function (lev, prav) {
   }, 200); // даем задание - останови колеса чуть позже
 };
 
-exports.connect = function () {
-  return new Shassi();
+exports.connect = function (debug) {
+  return new Shassi(debug);
 };
