@@ -1,5 +1,7 @@
 import { LeftWheel, RightWheel } from "./Wheels";
 import { connectDisplay } from "./OLED";
+import { IR_Receiver } from "./IR_Receiver";
+
 const VPERED = 6;
 const NAZAD = -6;
 
@@ -89,9 +91,8 @@ handlers[PLAY] = function () {
   oled.flip();
 };
 
-var pult = require("./modules/Pult").connect(P3, handlers, false);
-var menuLib = require("./modules/Menu");
-var menu;
+//var pult = require("./modules/Pult").connect(P3, handlers, false);
+IR_Receiver(P3, (code, pressed) => print({code, pressed}));
 var y_strelki = 20;
 function vopros() {
   oled.clear();
