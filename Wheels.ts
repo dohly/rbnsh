@@ -25,7 +25,6 @@ const BuildWheel = (
   });
   const speedUp = () => {
     currentSpeed = Math.min(1, currentSpeed + ACCELERATION);
-    print(currentSpeed);
     motor(currentSpeed * direction);
   };
   return (steps) => {

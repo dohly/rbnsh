@@ -1,7 +1,7 @@
 const REPEAT_CODE = 1;
 export const IR_Receiver = (
   pin: Pin,
-  onReceive: (code: any, keepedPressed: boolean) => void
+  onReceive: (code: any, repeat: boolean) => void
 ) => {
   pin.mode("input_pullup");
   let currentCode = 0;

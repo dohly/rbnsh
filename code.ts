@@ -1,6 +1,8 @@
 import { LeftWheel, RightWheel } from "./Wheels";
 import { connectDisplay } from "./OLED";
 import { IR_Receiver } from "./IR_Receiver";
+import { BuildServo } from "./Servo";
+import { KEY_CODES } from "./KEY_CODES";
 
 const VPERED = 6;
 const NAZAD = -6;
@@ -8,22 +10,12 @@ const NAZAD = -6;
 const VPERED_SLOW = 1;
 const NAZAD_SLOW = -1;
 
-const PLUS = 378132519;
-const MINUS = 378134559;
-const GREEN = 378126399;
-const PLAY = 378091719;
-
-const KEY_VPERED = 378101919;
-const KEY_NAZAD = 378124359;
-const KEY_VPRAVO = 378116199;
-const KEY_VLEVO = 378081519;
-
-var golova = require("./modules/Golova").connect();
+const golova = BuildServo(P8, 90);
 
 var handlers = {};
 var dontRun = true;
 var oled: any;
-handlers[KEY_VPERED] = function () {
+handlers[KEY_CODES.TOP] = function () {
   if (dontRun) {
     if (y_strelki == 20) {
       y_strelki = 40;
@@ -37,7 +29,7 @@ handlers[KEY_VPERED] = function () {
     RightWheel(VPERED);
   }
 };
-handlers[KEY_NAZAD] = function () {
+handlers[KEY_CODES.BOTTOM] = function () {
   if (dontRun) {
     if (y_strelki == 20) {
       y_strelki = 40;
@@ -50,24 +42,24 @@ handlers[KEY_NAZAD] = function () {
     RightWheel(NAZAD);
   }
 };
-handlers[KEY_VLEVO] = function () {
+handlers[KEY_CODES.LEFT] = function () {
   LeftWheel(NAZAD_SLOW);
   RightWheel(VPERED_SLOW);
 };
-handlers[KEY_VPRAVO] = function () {
+handlers[KEY_CODES.RIGHT] = function () {
   LeftWheel(VPERED_SLOW);
   RightWheel(NAZAD_SLOW);
 };
-handlers[PLUS] = function () {
-  golova.Poverni(55);
+handlers[KEY_CODES.PLUS] = function () {
+  golova(55);
 };
-handlers[MINUS] = function () {
-  golova.Poverni(125);
+handlers[KEY_CODES.MINUS] = function () {
+  golova(125);
 };
-handlers[GREEN] = function () {
-  golova.Pryamo();
+handlers[KEY_CODES.GREEN] = function () {
+  golova(90);
 };
-handlers[PLAY] = function () {
+handlers[KEY_CODES.PLAY] = function () {
   oled.setFontVector(15);
   oled.clear();
   if (y_strelki == 20) {
@@ -91,8 +83,7 @@ handlers[PLAY] = function () {
   oled.flip();
 };
 
-//var pult = require("./modules/Pult").connect(P3, handlers, false);
-IR_Receiver(P3, (code, pressed) => print({code, pressed}));
+IR_Receiver(P3, code => handlers[code]());
 var y_strelki = 20;
 function vopros() {
   oled.clear();
