@@ -1,4 +1,5 @@
 import { LeftWheel, RightWheel } from "./Wheels";
+import { connectDisplay } from "./OLED";
 const VPERED = 6;
 const NAZAD = -6;
 
@@ -95,7 +96,7 @@ var y_strelki = 20;
 function vopros() {
   oled.clear();
   oled.drawString("KAK DELA?", 0, 0);
-  oled.drawString("VESELO", 20, 20);
+  oled.drawString("GOOD", 20, 20);
   oled.drawString("TAK SEBE", 20, 40);
   oled.drawString(">", 0, y_strelki);
   oled.flip();
@@ -103,12 +104,12 @@ function vopros() {
 // настраиваем шину I²C
 PrimaryI2C.setup({ sda: SDA, scl: SCL });
 // подключаем библиотеку для работы с графическим дисплеем
-oled = require("./modules/SSD1306").connect(PrimaryI2C, function () {
-  //menu = menuLib.connect(screen);
-  // menu.Main(2);
-  oled.setFontVector(15);
-  oled.clear();
-  oled.drawString("PRIVET", 0, 0);
-  oled.flip();
+oled = connectDisplay(PrimaryI2C, function () {
+  if (oled) {
+    oled.setFontVector(15);
+    oled.clear();
+    oled.drawString("PRIVET", 0, 0);
+    oled.flip();
+  }
   setTimeout(vopros, 5000);
 });
