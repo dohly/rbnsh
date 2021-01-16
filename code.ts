@@ -1,8 +1,7 @@
-import { LeftWheel, RightWheel } from "./Wheels";
-import { connectDisplay } from "./OLED";
-import { IR_Receiver } from "./IR_Receiver";
-import { BuildServo } from "./Servo";
-import { KEY_CODES } from "./KEY_CODES";
+import { LeftWheel, RightWheel } from "./drivers/Wheels";
+import { connectDisplay } from "./drivers/OLED";
+import { IR_Receiver, KEY_CODES } from "./drivers/IR_Receiver";
+import { BuildServo } from "./drivers/Servo";
 
 const VPERED = 6;
 const NAZAD = -6;
