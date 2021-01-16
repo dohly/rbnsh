@@ -1,3 +1,4 @@
+import { LeftWheel, RightWheel } from "./Wheels";
 const VPERED = 6;
 const NAZAD = -6;
 
@@ -15,7 +16,6 @@ const KEY_VPRAVO = 378116199;
 const KEY_VLEVO = 378081519;
 
 var golova = require("./modules/Golova").connect();
-var shassi = require("./modules/Shassi").connect();
 
 var handlers = {};
 var dontRun = true;
@@ -30,7 +30,8 @@ handlers[KEY_VPERED] = function () {
 
     vopros();
   } else {
-    shassi.edNemnozhko(VPERED, VPERED);
+    LeftWheel(VPERED);
+    RightWheel(VPERED);
   }
 };
 handlers[KEY_NAZAD] = function () {
@@ -42,14 +43,17 @@ handlers[KEY_NAZAD] = function () {
     }
     vopros();
   } else {
-    shassi.edNemnozhko(NAZAD, NAZAD);
+    LeftWheel(NAZAD);
+    RightWheel(NAZAD);
   }
 };
 handlers[KEY_VLEVO] = function () {
-  shassi.edNemnozhko(NAZAD_SLOW, VPERED_SLOW);
+  LeftWheel(NAZAD_SLOW);
+  RightWheel(VPERED_SLOW);
 };
 handlers[KEY_VPRAVO] = function () {
-  shassi.edNemnozhko(VPERED_SLOW, NAZAD_SLOW);
+  LeftWheel(VPERED_SLOW);
+  RightWheel(NAZAD_SLOW);
 };
 handlers[PLUS] = function () {
   golova.Poverni(55);
