@@ -1,5 +1,5 @@
-import { Motor, M1, M2 } from "./Motorshield";
-import { Encoder, LeftEncoder, RightEncoder } from "./Encoder";
+import { Motor } from "./Motorshield";
+import { Encoder } from "./Encoder";
 
 export type Wheel = (steps: number) => void;
 
@@ -7,7 +7,7 @@ const STOP = 0;
 const START_SPEED = 0.25;
 const ACCELERATION = 0.01;
 
-const BuildWheel = (
+export const BuildWheel = (
   motor: Motor,
   encoder: Encoder,
   clockwiseForward: boolean
@@ -37,6 +37,3 @@ const BuildWheel = (
     speedUp();
   };
 };
-
-export const LeftWheel = BuildWheel(M1, LeftEncoder, false);
-export const RightWheel = BuildWheel(M2, RightEncoder, true);

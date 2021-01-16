@@ -1,20 +1,20 @@
-import { LeftWheel, RightWheel } from "./drivers/Wheels";
-import { connectDisplay } from "./drivers/OLED";
-import { IR_Receiver, KEY_CODES } from "./drivers/IR_Receiver";
-import { BuildServo } from "./drivers/Servo";
+import { KEY_CODES } from "./drivers/IR_Receiver";
+import { HardwareEvents, Hardware } from "./Hardware";
 
 const VPERED = 6;
 const NAZAD = -6;
 
 const VPERED_SLOW = 1;
 const NAZAD_SLOW = -1;
-
-const golova = BuildServo(P8, 90);
-
+let Route: Array<number[]> = [];
+const wheels = (l: number, r: number) => {
+  Route.push([l, r]);
+  Hardware.leftWheel(l);
+  Hardware.rightWheel(r);
+};
 var handlers = {};
 var dontRun = true;
-var oled: any;
-handlers[KEY_CODES.TOP] = function () {
+handlers[KEY_CODES.TOP] = () => {
   if (dontRun) {
     if (y_strelki == 20) {
       y_strelki = 40;
@@ -24,11 +24,10 @@ handlers[KEY_CODES.TOP] = function () {
 
     vopros();
   } else {
-    LeftWheel(VPERED);
-    RightWheel(VPERED);
+    wheels(VPERED, VPERED);
   }
 };
-handlers[KEY_CODES.BOTTOM] = function () {
+handlers[KEY_CODES.BOTTOM] = () => {
   if (dontRun) {
     if (y_strelki == 20) {
       y_strelki = 40;
@@ -37,30 +36,35 @@ handlers[KEY_CODES.BOTTOM] = function () {
     }
     vopros();
   } else {
-    LeftWheel(NAZAD);
-    RightWheel(NAZAD);
+    wheels(NAZAD, NAZAD);
   }
 };
-handlers[KEY_CODES.LEFT] = function () {
-  LeftWheel(NAZAD_SLOW);
-  RightWheel(VPERED_SLOW);
+handlers[KEY_CODES.LEFT] = () => {
+  wheels(NAZAD_SLOW, VPERED_SLOW);
 };
-handlers[KEY_CODES.RIGHT] = function () {
-  LeftWheel(VPERED_SLOW);
-  RightWheel(NAZAD_SLOW);
+handlers[KEY_CODES.RIGHT] = () => {
+  wheels(VPERED_SLOW, NAZAD_SLOW);
 };
-handlers[KEY_CODES.PLUS] = function () {
-  golova(55);
+handlers[KEY_CODES.PLUS] = () => {
+  Hardware.head(55);
 };
-handlers[KEY_CODES.MINUS] = function () {
-  golova(125);
+handlers[KEY_CODES.MINUS] = () => {
+  Hardware.head(125);
 };
-handlers[KEY_CODES.GREEN] = function () {
-  golova(90);
+handlers[KEY_CODES.GREEN] = () => {
+  Hardware.head(90);
 };
-handlers[KEY_CODES.PLAY] = function () {
-  oled.setFontVector(15);
-  oled.clear();
+handlers[KEY_CODES.CROSS] = () => {
+  for (let index = Route.length - 1; index > 0; index--) {
+    const [l, r] = Route[index];
+    Hardware.leftWheel(-1 * l);
+    Hardware.rightWheel(-1 * r);
+  }
+  Route = [];
+};
+handlers[KEY_CODES.PLAY] = () => {
+  Hardware.oled.setFontVector(15);
+  Hardware.oled.clear();
   if (y_strelki == 20) {
     var img = {
       width: 128,
@@ -73,34 +77,53 @@ handlers[KEY_CODES.PLAY] = function () {
       ),
     };
 
-    oled.drawImage(img, 0, 0);
+    Hardware.oled.drawImage(img, 0, 0);
     dontRun = false;
   } else {
-    oled.drawString("=(", 0, 0);
+    Hardware.oled.drawString("=(", 0, 0);
     dontRun = false;
   }
-  oled.flip();
+  Hardware.oled.flip();
 };
 
-IR_Receiver(P3, code => handlers[code]());
 var y_strelki = 20;
 function vopros() {
-  oled.clear();
-  oled.drawString("KAK DELA?", 0, 0);
-  oled.drawString("GOOD", 20, 20);
-  oled.drawString("TAK SEBE", 20, 40);
-  oled.drawString(">", 0, y_strelki);
-  oled.flip();
+  Hardware.oled.clear();
+  Hardware.oled.drawString("KAK DELA?", 0, 0);
+  Hardware.oled.drawString("ZASHIBIS", 20, 20);
+  Hardware.oled.drawString("TAK SEBE", 20, 40);
+  Hardware.oled.drawString(">", 0, y_strelki);
+  Hardware.oled.flip();
 }
-// настраиваем шину I²C
-PrimaryI2C.setup({ sda: SDA, scl: SCL });
-// подключаем библиотеку для работы с графическим дисплеем
-oled = connectDisplay(PrimaryI2C, function () {
-  if (oled) {
-    oled.setFontVector(15);
-    oled.clear();
-    oled.drawString("PRIVET", 0, 0);
-    oled.flip();
+
+function hi() {
+  if (Hardware.oled) {
+    Hardware.oled.setFontVector(15);
+    Hardware.oled.clear();
+    Hardware.oled.drawString("PRIVET", 0, 0);
+    Hardware.oled.flip();
   }
   setTimeout(vopros, 5000);
+}
+
+HardwareEvents.oledReady.subscribe(hi);
+HardwareEvents.irCodes.subscribe((x) => {
+  let handler = handlers[x];
+  if (handler) {
+    handler();
+  }
+});
+
+const testPromise = () =>
+  new Promise<void>((resolve, reject) => {
+    setTimeout(() => {
+      Hardware.head(45);
+      resolve();
+    }, 7000);
+  });
+
+testPromise().then(() => {
+  Hardware.oled.clear();
+  Hardware.oled.drawString("Ok, PROMISE", 0, 0);
+  Hardware.oled.flip();
 });
