@@ -1,6 +1,12 @@
 // webpack hack
 declare function __non_webpack_require__(s: string): any;
 
+// Espruino missing typings
+declare var Graphics: Graphics;
+declare interface EspruinoI2C extends I2C {
+    writeTo(address, ...data);
+}
+
 // Iskra JS typings
 declare const LED1: Pin;
 declare const SDA: Pin;

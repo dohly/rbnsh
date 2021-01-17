@@ -1,26 +1,67 @@
-const VPERED = 6;
-const NAZAD = -6;
+import { KEY_CODES } from "./drivers/IR_Receiver";
+import { Hardware } from "./Hardware";
+import { HardwareEvents } from "./HardwareEvents";
 
-const VPERED_SLOW = 1;
-const NAZAD_SLOW = -1;
+const VPERED = true;
+const NAZAD = false;
+let noKeys;
 
-const PLUS = 378132519;
-const MINUS = 378134559;
-const GREEN = 378126399;
-const PLAY = 378091719;
+let Route: Array<number[]> = [];
+let wheelsBusyTask: Promise<[number, number]> = null;
+const runWheelsLogged = (l: boolean, r: boolean) => {
+  const stopCondition = () => noKeys == null;
+  let lp = Hardware.leftWheel({
+    direction: l,
+    stopCondition,
+  });
+  let rp = Hardware.rightWheel({
+    direction: r,
+    stopCondition,
+  });
 
-const KEY_VPERED = 378101919;
-const KEY_NAZAD = 378124359;
-const KEY_VPRAVO = 378116199;
-const KEY_VLEVO = 378081519;
+  if (!wheelsBusyTask) {
+    wheelsBusyTask = Promise.all([lp, rp]);
+    wheelsBusyTask.then(([ls, rs]) => {
+      Route.push([ls, rs]);
+      wheelsBusyTask = null;
+    });
+  }
+};
 
-var golova = require("./modules/Golova").connect();
-var shassi = require("./modules/Shassi").connect();
+const rollbackRoute = () => {
+  if (Route.length === 0 || wheelsBusyTask) {
+    return;
+  }
+  let [l, r] = Route[Route.length - 1];
+  
+  let done = Promise.resolve(0);
+  let lp =
+    l == 0
+      ? done
+      : Hardware.leftWheel({
+          direction: l < 0,
+          stopCondition: (x) => x + l == 0,
+        });
 
+  let rp =
+    r == 0
+      ? done
+      : Hardware.rightWheel({
+          direction: r < 0,
+          stopCondition: (x) => x + r == 0,
+        });
+  wheelsBusyTask = Promise.all([lp, rp]);
+  wheelsBusyTask.then(() => {
+    setTimeout(() => {
+      Route.splice(-1, 1);
+      wheelsBusyTask = null;
+      rollbackRoute();
+    }, 1000);
+  });
+};
 var handlers = {};
 var dontRun = true;
-var oled: any;
-handlers[KEY_VPERED] = function () {
+handlers[KEY_CODES.TOP] = () => {
   if (dontRun) {
     if (y_strelki == 20) {
       y_strelki = 40;
@@ -30,10 +71,10 @@ handlers[KEY_VPERED] = function () {
 
     vopros();
   } else {
-    shassi.edNemnozhko(VPERED, VPERED);
+    runWheelsLogged(VPERED, VPERED);
   }
 };
-handlers[KEY_NAZAD] = function () {
+handlers[KEY_CODES.BOTTOM] = () => {
   if (dontRun) {
     if (y_strelki == 20) {
       y_strelki = 40;
@@ -42,27 +83,32 @@ handlers[KEY_NAZAD] = function () {
     }
     vopros();
   } else {
-    shassi.edNemnozhko(NAZAD, NAZAD);
+    runWheelsLogged(NAZAD, NAZAD);
   }
 };
-handlers[KEY_VLEVO] = function () {
-  shassi.edNemnozhko(NAZAD_SLOW, VPERED_SLOW);
+handlers[KEY_CODES.LEFT] = () => {
+  runWheelsLogged(NAZAD, VPERED);
 };
-handlers[KEY_VPRAVO] = function () {
-  shassi.edNemnozhko(VPERED_SLOW, NAZAD_SLOW);
+handlers[KEY_CODES.RIGHT] = () => {
+  runWheelsLogged(VPERED, NAZAD);
 };
-handlers[PLUS] = function () {
-  golova.Poverni(55);
+handlers[KEY_CODES.PLUS] = () => {
+  Hardware.head(55);
 };
-handlers[MINUS] = function () {
-  golova.Poverni(125);
+handlers[KEY_CODES.MINUS] = () => {
+  Hardware.head(125);
 };
-handlers[GREEN] = function () {
-  golova.Pryamo();
+handlers[KEY_CODES.GREEN] = () => {
+  Hardware.head(90);
 };
-handlers[PLAY] = function () {
-  oled.setFontVector(15);
-  oled.clear();
+
+handlers[KEY_CODES.PLAY] = () => {
+  if (!dontRun && !wheelsBusyTask) {
+    rollbackRoute();
+    return;
+  }
+  Hardware.oled.setFontVector(15);
+  Hardware.oled.clear();
   if (y_strelki == 20) {
     var img = {
       width: 128,
@@ -75,36 +121,46 @@ handlers[PLAY] = function () {
       ),
     };
 
-    oled.drawImage(img, 0, 0);
+    Hardware.oled.drawImage(img, 0, 0);
     dontRun = false;
   } else {
-    oled.drawString("=(", 0, 0);
+    Hardware.oled.drawString("=(", 0, 0);
     dontRun = false;
   }
-  oled.flip();
+  Hardware.oled.flip();
 };
 
-var pult = require("./modules/Pult").connect(P3, handlers, false);
-var menuLib = require("./modules/Menu");
-var menu;
 var y_strelki = 20;
 function vopros() {
-  oled.clear();
-  oled.drawString("KAK DELA?", 0, 0);
-  oled.drawString("VESELO", 20, 20);
-  oled.drawString("TAK SEBE", 20, 40);
-  oled.drawString(">", 0, y_strelki);
-  oled.flip();
+  Hardware.oled.clear();
+  Hardware.oled.drawString("KAK DELA?", 0, 0);
+  Hardware.oled.drawString("ZASHIBIS", 20, 20);
+  Hardware.oled.drawString("TAK SEBE", 20, 40);
+  Hardware.oled.drawString(">", 0, y_strelki);
+  Hardware.oled.flip();
 }
-// настраиваем шину I²C
-PrimaryI2C.setup({ sda: SDA, scl: SCL });
-// подключаем библиотеку для работы с графическим дисплеем
-oled = require("./modules/SSD1306").connect(PrimaryI2C, function () {
-  //menu = menuLib.connect(screen);
-  // menu.Main(2);
-  oled.setFontVector(15);
-  oled.clear();
-  oled.drawString("PRIVET", 0, 0);
-  oled.flip();
+
+function hi() {
+  if (Hardware.oled) {
+    Hardware.oled.setFontVector(15);
+    Hardware.oled.clear();
+    Hardware.oled.drawString("PRIVET", 0, 0);
+    Hardware.oled.flip();
+  }
   setTimeout(vopros, 5000);
+}
+
+HardwareEvents.oledReady.subscribe(hi);
+HardwareEvents.irCodes.subscribe((x) => {
+  if (noKeys) {
+    clearTimeout(noKeys);
+  }
+  noKeys = setTimeout(() => {
+    noKeys = null;
+  }, 150);
+
+  let handler = handlers[x];
+  if (handler) {
+    handler();
+  }
 });
