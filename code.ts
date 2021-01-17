@@ -1,5 +1,6 @@
 import { KEY_CODES } from "./drivers/IR_Receiver";
-import { HardwareEvents, Hardware } from "./Hardware";
+import { Hardware } from "./Hardware";
+import { HardwareEvents } from "./HardwareEvents";
 
 const VPERED = 6;
 const NAZAD = -6;
@@ -7,10 +8,38 @@ const NAZAD = -6;
 const VPERED_SLOW = 1;
 const NAZAD_SLOW = -1;
 let Route: Array<number[]> = [];
-const wheels = (l: number, r: number) => {
-  Route.push([l, r]);
-  Hardware.leftWheel(l);
-  Hardware.rightWheel(r);
+let totalPromise: Promise<[number, number]> = null;
+const runWheelsLogged = (l: number, r: number) => {
+  let lp = Hardware.leftWheel(l);
+  let rp = Hardware.rightWheel(r);
+
+  if (!totalPromise) {
+    totalPromise = Promise.all([lp, rp]);
+    totalPromise.then(([ls, rs]) => {
+      Route.push([ls, rs]);
+      totalPromise = null;
+    });
+  }
+};
+
+const rollbackRoute = () => {
+  if (Route.length === 0) {
+    return;
+  }
+  let [l, r] = Route[Route.length - 1];
+  let lp = Hardware.leftWheel(-l);
+  let rp = Hardware.rightWheel(-r);
+
+  if (!totalPromise) {
+    totalPromise = Promise.all([lp, rp]);
+    totalPromise.then(() => {
+      setTimeout(() => {
+        Route.splice(-1, 1);
+        totalPromise = null;
+        rollbackRoute();
+      }, 1000);
+    });
+  }
 };
 var handlers = {};
 var dontRun = true;
@@ -24,7 +53,7 @@ handlers[KEY_CODES.TOP] = () => {
 
     vopros();
   } else {
-    wheels(VPERED, VPERED);
+    runWheelsLogged(VPERED, VPERED);
   }
 };
 handlers[KEY_CODES.BOTTOM] = () => {
@@ -36,14 +65,14 @@ handlers[KEY_CODES.BOTTOM] = () => {
     }
     vopros();
   } else {
-    wheels(NAZAD, NAZAD);
+    runWheelsLogged(NAZAD, NAZAD);
   }
 };
 handlers[KEY_CODES.LEFT] = () => {
-  wheels(NAZAD_SLOW, VPERED_SLOW);
+  runWheelsLogged(NAZAD_SLOW, VPERED_SLOW);
 };
 handlers[KEY_CODES.RIGHT] = () => {
-  wheels(VPERED_SLOW, NAZAD_SLOW);
+  runWheelsLogged(VPERED_SLOW, NAZAD_SLOW);
 };
 handlers[KEY_CODES.PLUS] = () => {
   Hardware.head(55);
@@ -63,6 +92,10 @@ handlers[KEY_CODES.CROSS] = () => {
   Route = [];
 };
 handlers[KEY_CODES.PLAY] = () => {
+  if (!dontRun) {
+    rollbackRoute();
+    return;
+  }
   Hardware.oled.setFontVector(15);
   Hardware.oled.clear();
   if (y_strelki == 20) {
@@ -114,16 +147,16 @@ HardwareEvents.irCodes.subscribe((x) => {
   }
 });
 
-const testPromise = () =>
-  new Promise<void>((resolve, reject) => {
-    setTimeout(() => {
-      Hardware.head(45);
-      resolve();
-    }, 7000);
-  });
+// const testPromise = () =>
+//   new Promise<void>((resolve, reject) => {
+//     setTimeout(() => {
+//       Hardware.head(45);
+//       resolve();
+//     }, 7000);
+//   });
 
-testPromise().then(() => {
-  Hardware.oled.clear();
-  Hardware.oled.drawString("Ok, PROMISE", 0, 0);
-  Hardware.oled.flip();
-});
+// testPromise().then(() => {
+//   Hardware.oled.clear();
+//   Hardware.oled.drawString("Ok, PROMISE", 0, 0);
+//   Hardware.oled.flip();
+// });
