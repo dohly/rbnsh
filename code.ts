@@ -2,44 +2,62 @@ import { KEY_CODES } from "./drivers/IR_Receiver";
 import { Hardware } from "./Hardware";
 import { HardwareEvents } from "./HardwareEvents";
 
-const VPERED = 6;
-const NAZAD = -6;
+const VPERED = true;
+const NAZAD = false;
+let noKeys;
 
-const VPERED_SLOW = 1;
-const NAZAD_SLOW = -1;
 let Route: Array<number[]> = [];
-let totalPromise: Promise<[number, number]> = null;
-const runWheelsLogged = (l: number, r: number) => {
-  let lp = Hardware.leftWheel(l);
-  let rp = Hardware.rightWheel(r);
+let wheelsBusyTask: Promise<[number, number]> = null;
+const runWheelsLogged = (l: boolean, r: boolean) => {
+  const stopCondition = () => noKeys == null;
+  let lp = Hardware.leftWheel({
+    direction: l,
+    stopCondition,
+  });
+  let rp = Hardware.rightWheel({
+    direction: r,
+    stopCondition,
+  });
 
-  if (!totalPromise) {
-    totalPromise = Promise.all([lp, rp]);
-    totalPromise.then(([ls, rs]) => {
+  if (!wheelsBusyTask) {
+    wheelsBusyTask = Promise.all([lp, rp]);
+    wheelsBusyTask.then(([ls, rs]) => {
       Route.push([ls, rs]);
-      totalPromise = null;
+      wheelsBusyTask = null;
     });
   }
 };
 
 const rollbackRoute = () => {
-  if (Route.length === 0) {
+  if (Route.length === 0 || wheelsBusyTask) {
     return;
   }
   let [l, r] = Route[Route.length - 1];
-  let lp = Hardware.leftWheel(-l);
-  let rp = Hardware.rightWheel(-r);
+  
+  let done = Promise.resolve(0);
+  let lp =
+    l == 0
+      ? done
+      : Hardware.leftWheel({
+          direction: l < 0,
+          stopCondition: (x) => x + l == 0,
+        });
 
-  if (!totalPromise) {
-    totalPromise = Promise.all([lp, rp]);
-    totalPromise.then(() => {
-      setTimeout(() => {
-        Route.splice(-1, 1);
-        totalPromise = null;
-        rollbackRoute();
-      }, 1000);
-    });
-  }
+  let rp =
+    r == 0
+      ? done
+      : Hardware.rightWheel({
+          direction: r < 0,
+          stopCondition: (x) => x + r == 0,
+        });
+  wheelsBusyTask = Promise.all([lp, rp]);
+  wheelsBusyTask.then(() => {
+    setTimeout(() => {
+      Route.splice(-1, 1);
+      wheelsBusyTask = null;
+      rollbackRoute();
+    }, 1000);
+  });
 };
 var handlers = {};
 var dontRun = true;
@@ -69,10 +87,10 @@ handlers[KEY_CODES.BOTTOM] = () => {
   }
 };
 handlers[KEY_CODES.LEFT] = () => {
-  runWheelsLogged(NAZAD_SLOW, VPERED_SLOW);
+  runWheelsLogged(NAZAD, VPERED);
 };
 handlers[KEY_CODES.RIGHT] = () => {
-  runWheelsLogged(VPERED_SLOW, NAZAD_SLOW);
+  runWheelsLogged(VPERED, NAZAD);
 };
 handlers[KEY_CODES.PLUS] = () => {
   Hardware.head(55);
@@ -83,16 +101,9 @@ handlers[KEY_CODES.MINUS] = () => {
 handlers[KEY_CODES.GREEN] = () => {
   Hardware.head(90);
 };
-handlers[KEY_CODES.CROSS] = () => {
-  for (let index = Route.length - 1; index > 0; index--) {
-    const [l, r] = Route[index];
-    Hardware.leftWheel(-1 * l);
-    Hardware.rightWheel(-1 * r);
-  }
-  Route = [];
-};
+
 handlers[KEY_CODES.PLAY] = () => {
-  if (!dontRun) {
+  if (!dontRun && !wheelsBusyTask) {
     rollbackRoute();
     return;
   }
@@ -141,22 +152,15 @@ function hi() {
 
 HardwareEvents.oledReady.subscribe(hi);
 HardwareEvents.irCodes.subscribe((x) => {
+  if (noKeys) {
+    clearTimeout(noKeys);
+  }
+  noKeys = setTimeout(() => {
+    noKeys = null;
+  }, 150);
+
   let handler = handlers[x];
   if (handler) {
     handler();
   }
 });
-
-// const testPromise = () =>
-//   new Promise<void>((resolve, reject) => {
-//     setTimeout(() => {
-//       Hardware.head(45);
-//       resolve();
-//     }, 7000);
-//   });
-
-// testPromise().then(() => {
-//   Hardware.oled.clear();
-//   Hardware.oled.drawString("Ok, PROMISE", 0, 0);
-//   Hardware.oled.flip();
-// });

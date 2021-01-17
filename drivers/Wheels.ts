@@ -1,7 +1,11 @@
 import { Motor } from "./Motorshield";
 import { Encoder } from "./Encoder";
 
-export type Wheel = (steps: number, constantSpeed?: number) => Promise<number>;
+export type Wheel = (options: {
+  direction: boolean;
+  stopCondition: (ticks: number) => boolean;
+  startSpeed?: number;
+}) => Promise<number>;
 
 const STOP = 0;
 const START_SPEED = 0.3;
@@ -12,48 +16,41 @@ export const BuildWheel = (
   encoder: Encoder,
   clockwiseForward: boolean
 ): Wheel => {
-  let ticks = 0;
-  let currentSpeed = START_SPEED;
-  let direction: 1 | -1 = 1;
-  let stopper: () => void = null;
+  let currentSpeed = STOP;
+  let step: 1 | -1 = 1;
+  let onStopped: () => void = null;
+  let shouldStop: (ticks: number) => boolean = null;
   let totalTicks = 0;
   encoder(() => {
-    if (ticks > 0) {
-      ticks--;
-      speedUp();
-    } else {
-      currentSpeed = START_SPEED;
+    totalTicks = totalTicks + step;
+    if (shouldStop && shouldStop(totalTicks)) {
+      currentSpeed = STOP;
       motor(STOP);
-      if (stopper) {
-        stopper();
+      if (onStopped) {
+        onStopped();
       }
     }
   });
   const speedUp = () => {
-    currentSpeed = Math.min(1, currentSpeed + ACCELERATION);
-    motor(currentSpeed * direction);
+    currentSpeed = Math.min(1, currentSpeed * (1 + ACCELERATION));
+    let direction = clockwiseForward ? 1 : -1;
+    motor(currentSpeed * direction * step);
   };
   let promise: Promise<number> = null;
-  return (steps, constantSpeed?) => {
-    if (clockwiseForward) {
-      direction = steps > 0 ? 1 : -1;
-    } else {
-      direction = steps > 0 ? -1 : 1;
+  return (options) => {
+    step = options.direction ? 1 : -1;
+    if (currentSpeed === STOP) {
+      currentSpeed = options.startSpeed || START_SPEED;
     }
-    ticks = ticks + Math.abs(steps);
-    totalTicks = totalTicks + steps;
-    if (currentSpeed === START_SPEED) {
-      currentSpeed = constantSpeed || START_SPEED;
-      speedUp();
-    }
-
+    shouldStop = options.stopCondition;
+    speedUp();
     if (!promise) {
       promise = new Promise<number>((resolve, reject) => {
-        stopper = () => {
+        onStopped = () => {
           resolve(totalTicks);
           totalTicks = 0;
           promise = null;
-          stopper = null;
+          onStopped = null;
         };
       });
     }
