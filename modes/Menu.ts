@@ -1,9 +1,8 @@
 import { KEY_CODES } from "../drivers/IR_Receiver";
 import { Hardware } from "../Hardware";
-import { Handlers, Mode } from "./Mode";
-import { Timer } from "./Timer";
+import { Handlers, Handle } from "./Handle";
 
-const Menu = (items: Array<[string, () => void]>) => () => {
+export const Menu = (items: Array<[string, () => void]>) => () => {
   const step = 20;
   let s_item = 0;
 
@@ -34,23 +33,5 @@ const Menu = (items: Array<[string, () => void]>) => () => {
     [KEY_CODES.PLAY]: select,
   };
   draw();
-  Mode(handlers);
+  Handle(handlers);
 };
-
-export const MainMenu = Menu([
-  [
-    "Timer",
-    () => {
-      Hardware.oled.setFontVector(40);
-      const t = new Timer((x) => {
-        Hardware.oled.clear();
-        Hardware.oled.drawString(x, 0, 10);
-        Hardware.oled.flip();
-      });
-      t.startUp();
-      Mode({ [KEY_CODES.PLAY]: () => t.stop() });
-    },
-  ],
-  ["Marsohod", () => {}],
-  ["Else", () => {}],
-]);

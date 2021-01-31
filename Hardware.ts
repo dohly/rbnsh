@@ -15,8 +15,8 @@ const HardwareInit = () => {
   const rightEncoder = BuildEncoder(P10);
   const leftEncoder = BuildEncoder(P11);
   IR_Receiver(P3, (code) => HardwareEvents.irCodes.publish(code));
-  let leftWheel = BuildWheel(M1, leftEncoder, false);
-  let rightWheel = BuildWheel(M2, rightEncoder, true);
+  let leftWheel = BuildWheel(M2, leftEncoder, false);
+  let rightWheel = BuildWheel(M1, rightEncoder, true);
   return {
     head: BuildServo(P8, 90),
     leftWheel,
