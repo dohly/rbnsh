@@ -2,6 +2,7 @@ import { KEY_CODES } from "./drivers/IR_Receiver";
 import { Hardware } from "./Hardware";
 import { HardwareEvents } from "./HardwareEvents";
 import { Smile } from "./Images";
+import { MainMenu } from "./modes/Menu";
 
 const VPERED = true;
 const NAZAD = false;
@@ -62,31 +63,31 @@ const rollbackRoute = () => {
 };
 var handlers = {};
 var dontRun = true;
-handlers[KEY_CODES.TOP] = () => {
-  if (dontRun) {
-    if (y_strelki > 0) {
-      y_strelki = y_strelki - 20;
-    } else {
-      y_strelki = 20;
-    }
+// handlers[KEY_CODES.TOP] = () => {
+//   if (dontRun) {
+//     if (y_strelki > 0) {
+//       y_strelki = y_strelki - 20;
+//     } else {
+//       y_strelki = 20;
+//     }
 
-    vopros();
-  } else {
-    runWheelsLogged(VPERED, VPERED);
-  }
-};
-handlers[KEY_CODES.BOTTOM] = () => {
-  if (dontRun) {
-    if (y_strelki < 40) {
-      y_strelki = y_strelki + 20;
-    } else {
-      y_strelki = 0;
-    }
-    vopros();
-  } else {
-    runWheelsLogged(NAZAD, NAZAD);
-  }
-};
+//     vopros();
+//   } else {
+//     runWheelsLogged(VPERED, VPERED);
+//   }
+// };
+// handlers[KEY_CODES.BOTTOM] = () => {
+//   if (dontRun) {
+//     if (y_strelki < 40) {
+//       y_strelki = y_strelki + 20;
+//     } else {
+//       y_strelki = 0;
+//     }
+//     vopros();
+//   } else {
+//     runWheelsLogged(NAZAD, NAZAD);
+//   }
+// };
 handlers[KEY_CODES.LEFT] = () => {
   runWheelsLogged(NAZAD, VPERED);
 };
@@ -105,10 +106,7 @@ handlers[KEY_CODES.GREEN] = () => {
 
 handlers[KEY_CODES.PLAY] = () => {
   if (y_strelki == 0) {
-    Hardware.oled.clear();
-    Hardware.oled.setFontVector(40);
-    Hardware.oled.drawString("00:00", 0, 10);
-    Hardware.oled.flip();
+    
     return;
   }
   if (!dontRun && !wheelsBusyTask) {
@@ -127,14 +125,7 @@ handlers[KEY_CODES.PLAY] = () => {
 };
 
 var y_strelki = 0;
-function vopros() {
-  Hardware.oled.clear();
-  Hardware.oled.drawString("SECONDS", 20, 0);
-  Hardware.oled.drawString("ZASHIBIS", 20, 20);
-  Hardware.oled.drawString("TAK SEBE", 20, 40);
-  Hardware.oled.drawString(">", 0, y_strelki);
-  Hardware.oled.flip();
-}
+
 
 function hi() {
   if (Hardware.oled) {
@@ -143,20 +134,7 @@ function hi() {
     Hardware.oled.drawImage(Smile, 0, 0);
     Hardware.oled.flip();
   }
-  setTimeout(vopros, 5000);
+  setTimeout(MainMenu, 5000);
 }
 
 HardwareEvents.oledReady.subscribe(hi);
-HardwareEvents.irCodes.subscribe((x) => {
-  if (noKeys) {
-    clearTimeout(noKeys);
-  }
-  noKeys = setTimeout(() => {
-    noKeys = null;
-  }, 150);
-
-  let handler = handlers[x];
-  if (handler) {
-    handler();
-  }
-});
