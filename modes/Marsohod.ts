@@ -1,6 +1,8 @@
 import { KEY_CODES } from "../drivers/IR_Receiver";
 import { Hardware } from "../Hardware";
+import { Smile } from "../Images";
 import { Handle } from "./Handle";
+import { MainMenu } from "./MainMenu";
 
 const VPERED = true;
 const NAZAD = false;
@@ -59,7 +61,10 @@ const rollbackRoute = () => {
     }, 1000);
   });
 };
-export const Marsohod = () =>
+export const Marsohod = () => {
+  Hardware.oled.clear();
+  Hardware.oled.drawImage(Smile, 0, 0);
+  Hardware.oled.flip();
   Handle({
     [KEY_CODES.TOP]: () => runWheelsLogged(VPERED, VPERED),
     [KEY_CODES.BOTTOM]: () => runWheelsLogged(NAZAD, NAZAD),
@@ -75,6 +80,7 @@ export const Marsohod = () =>
         return;
       }
     },
+    [KEY_CODES.CROSS]: MainMenu,
     default: () => {
       if (noKeys) {
         clearTimeout(noKeys);
@@ -84,3 +90,4 @@ export const Marsohod = () =>
       }, 150);
     },
   });
+};
