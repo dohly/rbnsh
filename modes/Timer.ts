@@ -2,6 +2,7 @@ export class Timer {
   private seconds = 0;
   private minutes = 0;
   private interval;
+  private started = false;
   constructor(private changed: (s: string) => void) {}
 
   private tick(increment: number) {
@@ -20,9 +21,25 @@ export class Timer {
     return `${leadingZero(this.minutes)}:${leadingZero(this.seconds)}`;
   }
 
-  public startUp() {
-    if (!this.interval) {
-      this.interval = setInterval(() => this.tick(1), 1000);
+  public startUp = () =>
+    new Promise<void>((resolve, reject) => {
+      if (!this.interval) {
+        this.started = false;
+        this.interval = setInterval(() => {
+          this.tick(1);
+          if (!this.started) {
+            this.started = true;
+            resolve();
+          }
+        }, 1000);
+      }
+    });
+
+  public pause() {
+    if (this.interval) {
+      this.stop();
+    } else {
+      this.startUp();
     }
   }
 

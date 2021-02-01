@@ -15,11 +15,15 @@ export const MainMenu = Menu([
         Hardware.oled.drawString(x, 0, 10);
         Hardware.oled.flip();
       });
-      t.startUp();
-      Handle({
-        [KEY_CODES.PLAY]: () => t.stop(),
-        [KEY_CODES.LEFT]: MainMenu,
-      });
+      t.startUp().then(() =>
+        Handle({
+          [KEY_CODES.PLAY]: () => t.pause(),
+          [KEY_CODES.CROSS]: () => {
+            t.stop();
+            MainMenu();
+          },
+        })
+      );
     },
   ],
   ["Marsohod", Marsohod],

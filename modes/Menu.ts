@@ -7,6 +7,7 @@ export const Menu = (items: Array<[string, () => void]>) => () => {
   let s_item = 0;
 
   const draw = () => {
+    Hardware.oled.setFontVector(15);
     Hardware.oled.clear();
     for (let i = 0; i < items.length; i++) {
       const [item, _] = items[i];

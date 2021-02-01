@@ -3,8 +3,7 @@ import { HardwareEvents } from "./HardwareEvents";
 import { Smile } from "./Images";
 import { MainMenu } from "./modes/MainMenu";
 
-
-function hi() {
+HardwareEvents.oledReady.subscribe(() => {
   if (Hardware.oled) {
     Hardware.oled.clear();
     Hardware.oled.setFontVector(15);
@@ -12,6 +11,4 @@ function hi() {
     Hardware.oled.flip();
   }
   setTimeout(MainMenu, 5000);
-}
-
-HardwareEvents.oledReady.subscribe(hi);
+});
