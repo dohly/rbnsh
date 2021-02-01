@@ -1,50 +1,53 @@
-export class Timer {
-  private seconds = 0;
-  private minutes = 0;
-  private interval;
-  private started = false;
-  constructor(private changed: (s: string) => void) {}
+import { EventStream } from "../SimpleEventStream";
 
-  private tick(increment: number) {
-    this.seconds += increment;
-    if (this.seconds > 59) {
-      this.seconds = 0;
-      this.minutes++;
-    } else if (this.seconds < 0) {
-      this.seconds = 59;
-      this.minutes--;
+export const Timer = new EventStream<string>();
+let seconds = 0;
+let minutes = 0;
+let t_interval;
+let started = false;
+
+const tick = (increment: number) => {
+  seconds += increment;
+  if (seconds > 59) {
+    seconds = 0;
+    minutes++;
+  } else if (seconds < 0) {
+    seconds = 59;
+    minutes--;
+  }
+  Timer.publish(toString());
+};
+const toString = () => {
+  const leadingZero = (v) => (v > 9 ? `${v}` : `0${v}`);
+  return `${leadingZero(minutes)}:${leadingZero(seconds)}`;
+};
+
+export const startUp = () =>
+  new Promise<void>((resolve, reject) => {
+    if (!t_interval) {
+      started = false;
+      t_interval = setInterval(() => {
+        tick(1);
+        if (!started) {
+          started = true;
+          resolve();
+        }
+      }, 1000);
     }
-    this.changed(this.toString());
-  }
-  private toString() {
-    const leadingZero = (v) => (v > 9 ? `${v}` : `0${v}`);
-    return `${leadingZero(this.minutes)}:${leadingZero(this.seconds)}`;
-  }
+  });
 
-  public startUp = () =>
-    new Promise<void>((resolve, reject) => {
-      if (!this.interval) {
-        this.started = false;
-        this.interval = setInterval(() => {
-          this.tick(1);
-          if (!this.started) {
-            this.started = true;
-            resolve();
-          }
-        }, 1000);
-      }
-    });
-
-  public pause() {
-    if (this.interval) {
-      this.stop();
-    } else {
-      this.startUp();
-    }
+export const pause = () => {
+  if (t_interval) {
+    clearInterval(t_interval);
+    t_interval = null;
+  } else {
+    startUp();
   }
+};
 
-  public stop() {
-    clearInterval(this.interval);
-    this.interval = null;
-  }
-}
+export const stop = () => {
+  clearInterval(t_interval);
+  t_interval = null;
+  seconds = 0;
+  minutes = 0;
+};
