@@ -11,6 +11,7 @@ declare interface EspruinoI2C extends I2C {
 declare const LED1: Pin;
 declare const SDA: Pin;
 declare const SCL: Pin;
+declare const P0: Pin;
 declare const P1: Pin;
 declare const P2: Pin;
 declare const P3: Pin;
@@ -23,3 +24,4 @@ declare const P9: Pin;
 declare const P10: Pin;
 declare const P11: Pin;
 declare const PrimaryI2C: I2C;
+declare const PrimarySerial: Serial;

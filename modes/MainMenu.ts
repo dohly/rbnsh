@@ -4,6 +4,7 @@ import { Menu } from "./Menu";
 import { Handle } from "./Handle";
 import { startUp, Timer, pause, stop } from "./Timer";
 import { Marsohod } from "./Marsohod";
+import { mp3 } from "../drivers/MP3";
 
 export const MainMenu = Menu([
   [
@@ -27,5 +28,11 @@ export const MainMenu = Menu([
     },
   ],
   ["Marsohod", Marsohod],
-  ["Else", () => {}],
+  [
+    "Else",
+    () => {
+      mp3.getTotalFilesOnFlash()
+      //mp3.play(1);
+    },
+  ],
 ]);
