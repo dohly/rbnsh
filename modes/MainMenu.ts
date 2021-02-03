@@ -29,10 +29,15 @@ export const MainMenu = Menu([
   ],
   ["Marsohod", Marsohod],
   [
-    "Else",
+    "music",
     () => {
-      mp3.getTotalFilesOnFlash()
-      //mp3.play(1);
+      Handle({
+        [KEY_CODES.LEFT]: () => mp3.playNext(),
+        [KEY_CODES.RIGHT]: () => mp3.playPrevious(),
+        [KEY_CODES.TOP]: () => mp3.increaseVolume(),
+        [KEY_CODES.BOTTOM]: () => mp3.decreaseVolume(),
+        [KEY_CODES.CROSS]: () => MainMenu(),
+      });
     },
   ],
 ]);
