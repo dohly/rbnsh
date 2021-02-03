@@ -36,7 +36,10 @@ export const MainMenu = Menu([
         [KEY_CODES.RIGHT]: () => mp3.playPrevious(),
         [KEY_CODES.TOP]: () => mp3.increaseVolume(),
         [KEY_CODES.BOTTOM]: () => mp3.decreaseVolume(),
-        [KEY_CODES.CROSS]: () => MainMenu(),
+        [KEY_CODES.CROSS]: () => {
+          mp3.pause();
+          MainMenu();
+        },
       });
     },
   ],
