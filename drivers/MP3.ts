@@ -3,9 +3,9 @@ const tx = P1;
 const rx = P0;
 const serial = PrimarySerial;
 
-const START_BYTE = 0x7e;
-const END_BYTE = 0xef;
-const VERSION_BYTE = 0xff;
+const START_BYTE = 0x7E;
+const END_BYTE = 0xEF;
+const VERSION_BYTE = 0xFF;
 const DATA_LENGTH = 0x06;
 const REQUEST_ACK = rx ? 0x01 : 0x00;
 
