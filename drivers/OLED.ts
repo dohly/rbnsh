@@ -82,7 +82,7 @@ export const connectDisplay = (
   let oled = Graphics.createArrayBuffer(C.OLED_WIDTH, initCmds[4] + 1, 1, {
     vertical_byte: true,
   }) as OLED_SSD1306;
-
+  oled.setRotation(2, false);
   var addr = 0x3c;
   if (options) {
     if (options.address) addr = options.address;

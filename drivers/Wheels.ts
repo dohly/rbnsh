@@ -9,7 +9,7 @@ export type Wheel = (options: {
 
 const STOP = 0;
 const START_SPEED = 0.3;
-const ACCELERATION = 0.01;
+const ACCELERATION = 0.05;
 
 export const BuildWheel = (
   motor: Motor,
