@@ -37,12 +37,25 @@ const rollbackRoute = () => {
   let [l, r] = Route[Route.length - 1];
 
   let done = Promise.resolve(0);
+  const checkStepsDone = (steps) => {
+    let pd = steps;
+    return (x) => {
+      const diff = Math.abs(x + steps);
+      print(diff);
+      if (diff < pd) {
+        pd = diff;
+        return false;
+      }
+      pd = 0;
+      return true;
+    };
+  };
   let lp =
     l == 0
       ? done
       : Hardware.leftWheel({
           direction: l < 0,
-          stopCondition: (x) => x + l == 0,
+          stopCondition: checkStepsDone(l),
         });
 
   let rp =
@@ -50,7 +63,7 @@ const rollbackRoute = () => {
       ? done
       : Hardware.rightWheel({
           direction: r < 0,
-          stopCondition: (x) => x + r == 0,
+          stopCondition: checkStepsDone(r),
         });
   wheelsBusyTask = Promise.all([lp, rp]);
   wheelsBusyTask.then(() => {

@@ -1,11 +1,13 @@
+import { HardwareEvents } from "../HardwareEvents";
+
 // IskraJS pins
 const tx = P1;
 const rx = P0;
 const serial = PrimarySerial;
 
-const START_BYTE = 0x7E;
-const END_BYTE = 0xEF;
-const VERSION_BYTE = 0xFF;
+const START_BYTE = 0x7e;
+const END_BYTE = 0xef;
+const VERSION_BYTE = 0xff;
 const DATA_LENGTH = 0x06;
 const REQUEST_ACK = rx ? 0x01 : 0x00;
 
@@ -65,6 +67,7 @@ enum Source {
 }
 
 let buffer: string = "";
+let mp3timer;
 serial.setup(9600, { tx, rx });
 serial.on("data", (data) => {
   buffer += data;
@@ -77,10 +80,19 @@ serial.on("data", (data) => {
         (256 + x.charCodeAt(0)).toString(16).substr(-2).toUpperCase()
       );
     buffer = buffer.slice(10);
-    console.log(`Returned: 0x${parseByte(packet[3])}`);
+    const byte1 = parseByte(packet[3]);
     console.log(
-      `Parameter: 0x${parseByte(packet[5])}, 0x${parseByte(packet[6])}`
+      `Returned: 0x${byte1} Parameter: 0x${parseByte(packet[5])}, 0x${parseByte(
+        packet[6]
+      )}`
     );
+    if (packet[3] == "3D" && !mp3timer) {
+      mp3timer = setTimeout(() => {
+        HardwareEvents.mp3Played.publish(packet[6]);
+        clearTimeout(mp3timer);
+        mp3timer = null;
+      }, 150);
+    }
   }
 });
 
@@ -111,9 +123,11 @@ const run = (command: Command, value: number = 0) => {
     getLowByte(checksum),
     END_BYTE,
   ];
+  console.log(payload);
   serial.write(payload);
 };
-
+const between = (v: number, min: number, max: number) =>
+  Math.max(min, Math.min(max, v));
 export const mp3 = {
   playNext: () => run(Command.Next),
   playPrevious: () => run(Command.Previous),
@@ -146,18 +160,18 @@ export const mp3 = {
   resume: () => run(Command.Resume),
   reset: () => run(Command.Reset),
 
-  play: (trackNumber?: number) => {
-    if (typeof trackNumber !== "undefined") {
+  play: (trackNumber?: number) =>
+    new Promise<void>((resolve, _) => {
+      HardwareEvents.mp3Played.once((x) => {
+        if (x == trackNumber) {
+          resolve();
+        }
+      });
       run(Command.SetTrack, trackNumber);
-    } else {
-      run(Command.Play);
-    }
-  },
+    }),
   pause: () => run(Command.Pause),
-  setPlaybackFolder: (folder: number) => {
-    const f = Math.max(1, Math.min(10, folder));
-    run(Command.SetFolder, f);
-  },
+  setPlaybackFolder: (folder: number) =>
+    run(Command.SetFolder, between(folder, 1, 10)),
   setGain: (gain: number) => {
     const g = Math.max(0, Math.min(31, gain));
     run(Command.SetGain, g);

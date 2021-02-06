@@ -5,5 +5,6 @@ export const HardwareEvents = {
     irCodes: new EventStream<any>(0.1),
     leftWheelDone: new EventStream<number>(),
     rightWheelDone: new EventStream<number>(),
+    mp3Played:new EventStream<number>()
   };
   

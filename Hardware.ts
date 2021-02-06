@@ -7,9 +7,16 @@ import { BuildServo } from "./drivers/Servo";
 import { BuildWheel } from "./drivers/Wheels";
 import { HardwareEvents } from "./HardwareEvents";
 
-
 const HardwareInit = () => {
-  mp3.setPlaybackFolder(1);
+  setTimeout(() => {
+    mp3.setGain(1);
+    mp3
+      .play(1)
+      .then(() => mp3.play(2))
+      .then(() => mp3.play(3))
+      .then(() => mp3.play(5));
+  }, 1000);
+
   PrimaryI2C.setup({ sda: SDA, scl: SCL });
   const oled = connectDisplay(PrimaryI2C, () =>
     HardwareEvents.oledReady.publish()
