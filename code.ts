@@ -2,12 +2,16 @@ import { Hardware } from "./Hardware";
 import { HardwareEvents } from "./HardwareEvents";
 import { Smile } from "./Images";
 import { MainMenu } from "./modes/MainMenu";
-HardwareEvents.oledReady.subscribe(() => {
-  if (Hardware.oled) {
-    Hardware.oled.clear();
-    Hardware.oled.setFontVector(15);
-    Hardware.oled.drawImage(Smile, 0, 0);
-    Hardware.oled.flip();
-  }
-  setTimeout(MainMenu, 5000);
-});
+import { StartMenu } from "./modes/StartMenu";
+import { Phrazes } from "./voice/Phrazes";
+import { sayPhraze } from "./voice/Say";
+
+setTimeout(
+  () =>
+    sayPhraze(Phrazes.Hi)
+      .then(() => sayPhraze(Phrazes.Sofia))
+      .then(() => sayPhraze(Phrazes.Veronika))
+      .then(() => sayPhraze(Phrazes.MainQuestion))
+      .then(StartMenu),
+  4000
+);

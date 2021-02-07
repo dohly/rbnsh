@@ -4,6 +4,7 @@ import { Menu } from "./Menu";
 import { Handle } from "./Handle";
 import { startUp, Timer, pause, stop } from "./Timer";
 import { Marsohod } from "./Marsohod";
+import { sayNumber } from "../voice/Say";
 
 export const MainMenu = Menu([
   [
@@ -31,14 +32,7 @@ export const MainMenu = Menu([
     "music",
     () => {
       Handle({
-        [KEY_CODES.LEFT]: () => {
-          Hardware.mp3
-            .play(1, 1)
-            .then(() => Hardware.mp3.play(1, 2))
-            .then(() => Hardware.mp3.play(2, 1))
-            .then(() => Hardware.mp3.play(2, 2))
-            .then(() => Hardware.mp3.play(2, 3));
-        },
+        [KEY_CODES.LEFT]: () => Hardware.mp3.playNext(),
         [KEY_CODES.RIGHT]: () => Hardware.mp3.playPrevious(),
         [KEY_CODES.TOP]: () => Hardware.mp3.increaseVolume(),
         [KEY_CODES.BOTTOM]: () => Hardware.mp3.decreaseVolume(),
@@ -46,6 +40,7 @@ export const MainMenu = Menu([
           Hardware.mp3.pause();
           MainMenu();
         },
+        [KEY_CODES.X]: () => sayNumber(536),
       });
     },
   ],

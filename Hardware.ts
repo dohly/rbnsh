@@ -9,9 +9,13 @@ import { HardwareEvents } from "./HardwareEvents";
 
 const HardwareInit = () => {
   PrimaryI2C.setup({ sda: SDA, scl: SCL });
-  const oled = connectDisplay(PrimaryI2C, () =>
-    HardwareEvents.oledReady.publish()
-  );
+  const oled = connectDisplay(PrimaryI2C, () => {
+    try {
+      HardwareEvents.oledReady.publish();
+    } catch {
+      setTimeout(() => HardwareEvents.oledReady.publish(), 400);
+    }
+  });
   const rightEncoder = BuildEncoder(P10);
   const leftEncoder = BuildEncoder(P11);
   IR_Receiver(P3, (code) => HardwareEvents.irCodes.publish(code));
@@ -28,3 +32,5 @@ const HardwareInit = () => {
 };
 
 export const Hardware = HardwareInit();
+export const Mp3 = Hardware.mp3;
+export const oled = Hardware.oled;

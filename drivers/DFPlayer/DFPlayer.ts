@@ -63,7 +63,7 @@ export class DFPlayer {
             (256 + x.charCodeAt(0)).toString(16).substr(-2).toUpperCase()
           );
         buffer = buffer.slice(10);
-        console.log("resp", packet.join(" "));
+        //console.log("resp", packet.join(" "));
       }
     });
     setTimeout(() => serial.write(instruction(Command.Init, true, 0, 0)), 3000);
@@ -71,7 +71,7 @@ export class DFPlayer {
 
   public run(command: Command, value: number = 0, p1: number = 0) {
     const payload = instruction(command, true, p1, value);
-    console.log("req", payload.map((x) => x.toString(16)).join(" "));
+    //console.log("req", payload.map((x) => x.toString(16)).join(" "));
     this.serial.write(payload);
   }
 

@@ -8,7 +8,7 @@ const C = {
 var extVcc = false; // if true, don't start charge pump
 
 export interface OLED_Options {
-  rst: any;
+  rst: Pin;
   address?: any;
   height?: number;
   width?: number;
@@ -90,22 +90,22 @@ export const connectDisplay = (
     if (options.rst) digitalPulse(options.rst, false, 10);
   }
 
-  setTimeout(function () {
-    // configure the OLED
-    initCmds.forEach(function (d) {
-      i2c.writeTo(addr, [0, d]);
-    });
-  }, 50);
+  setTimeout(() => {
+      // configure the OLED
+      initCmds.forEach((d) => {
+        i2c.writeTo(addr, [0, d]);
+      });
+    }, 50);
 
   // if there is a callback, call it now(ish)
-  if (callback !== undefined) setTimeout(callback, 100);
+  if (callback !== undefined) setTimeout(callback, 200);
 
   // write to the screen
   oled.flip = function () {
     // set how the data is to be sent (whole screen)
-    flipCmds.forEach(function (d) {
-      i2c.writeTo(addr, [0, d]);
-    });
+    flipCmds.forEach((d) => {
+        i2c.writeTo(addr, [0, d]);
+      });
     var chunk = new Uint8Array(C.OLED_CHUNK + 1);
 
     chunk[0] = C.OLED_CHAR;
