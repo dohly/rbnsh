@@ -1,5 +1,6 @@
 import { Mp3 } from "../Hardware";
 import { Phrazes } from "./Phrazes";
+import { Units } from "./Units";
 
 enum Folders {
   smallNumbers = 1,
@@ -46,3 +47,4 @@ export const sayNumber = (n: number) => {
 };
 
 export const sayPhraze = (p: Phrazes) => Mp3.play(Folders.phrazes, p);
+export const sayUnit = (u: Units) => Mp3.play(Folders.units, u);

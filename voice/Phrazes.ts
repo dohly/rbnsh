@@ -6,5 +6,6 @@ export enum Phrazes {
     MainQuestion,
     Very,
     Good,
-    Bad
+    Bad,
+    BeFaster
 }

@@ -1,4 +1,7 @@
 import { EventStream } from "../SimpleEventStream";
+import { Phrazes } from "../voice/Phrazes";
+import { sayNumber, sayPhraze, sayUnit } from "../voice/Say";
+import { Units } from "../voice/Units";
 
 export const Timer = new EventStream<string>();
 let seconds = 0;
@@ -11,6 +14,15 @@ const tick = (increment: number) => {
   if (seconds > 59) {
     seconds = 0;
     minutes++;
+    let p: Promise<void>;
+    if (minutes == 1) {
+      p = sayUnit(Units.Minuta);
+    } else if (minutes < 5) {
+      p = sayNumber(minutes).then(() => sayUnit(Units.Minuti));
+    } else {
+      p = sayNumber(minutes).then(() => sayUnit(Units.Minut));
+    }
+    p.then(() => sayPhraze(Phrazes.BeFaster));
   } else if (seconds < 0) {
     seconds = 59;
     minutes--;
