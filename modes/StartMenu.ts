@@ -13,8 +13,10 @@ export const StartMenu = Menu([
       oled.setFontVector(15);
       oled.drawImage(Smile, 0, 0);
       oled.flip();
-      setTimeout(MainMenu, 5000);
+      sayPhraze(Phrazes.Very)
+      .then(() => sayPhraze(Phrazes.Good))
+      .then(MainMenu);
     },
   ],
-  ["NET", () => sayPhraze(Phrazes.Select)],
+  ["NET", () => sayPhraze(Phrazes.Very).then(() => sayPhraze(Phrazes.Bad))],
 ]);
