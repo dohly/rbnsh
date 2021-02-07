@@ -40,11 +40,14 @@ const instruction = (cmd: Command, ack: boolean, p1: number, p2: number) => {
 };
 export class DFPlayer {
   private busyStream = new EventStream<any>();
+  private busy = false;
   constructor(tx: Pin, rx: Pin, busyPin: Pin, private serial: Serial) {
     busyPin.mode("input");
+    this.busyStream.subscribe(() => (this.busy = false));
     setWatch((x) => this.busyStream.publish(x), busyPin, {
       repeat: true,
       edge: "rising",
+      debounceTime: 100,
     });
     let buffer: string = "";
 
@@ -63,7 +66,7 @@ export class DFPlayer {
         console.log("resp", packet.join(" "));
       }
     });
-    serial.write(instruction(Command.Init, true, 0, 0));
+    setTimeout(() => serial.write(instruction(Command.Init, true, 0, 0)), 3000);
   }
 
   public run(command: Command, value: number = 0, p1: number = 0) {
@@ -103,10 +106,15 @@ export class DFPlayer {
   resume = () => this.run(Command.Resume);
   reset = () => this.run(Command.Reset);
 
-  play = (f, t) =>
-    new Promise<void>((resolve, _) => {
-      this.busyStream.once(resolve);
-      this.run(Command.SetFolder, t, f);
+  play = (folder, track) =>
+    new Promise<void>((resolve, reject) => {
+      if (this.busy) {
+        reject("DFPlayer is busy");
+      } else {
+        this.busy = true;
+        this.busyStream.once(resolve);
+        this.run(Command.SetFolder, track, folder);
+      }
     });
   pause = () => this.run(Command.Pause);
   setPlaybackFolder = (folder: number) =>
