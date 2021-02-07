@@ -14,13 +14,13 @@ const tick = (increment: number) => {
   if (seconds > 59) {
     seconds = 0;
     minutes++;
-    let p: Promise<void>;
+    let p = sayNumber(minutes, true);
     if (minutes == 1) {
-      p = sayUnit(Units.Minuta);
+      p = p.then(() => sayUnit(Units.Minuta));
     } else if (minutes < 5) {
-      p = sayNumber(minutes).then(() => sayUnit(Units.Minuti));
+      p = p.then(() => sayUnit(Units.Minuti));
     } else {
-      p = sayNumber(minutes).then(() => sayUnit(Units.Minut));
+      p = p.then(() => sayUnit(Units.Minut));
     }
     p.then(() => sayPhraze(Phrazes.BeFaster));
   } else if (seconds < 0) {

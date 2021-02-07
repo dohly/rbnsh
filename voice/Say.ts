@@ -10,13 +10,14 @@ enum Folders {
   hundreds = 99,
 }
 
-const sayTripleDigits = (arr: number[]) => {
+const sayTripleDigits = (arr: number[], female: boolean) => {
   const [d100, d10, d1] = arr;
   const done = Promise.resolve();
   const p100 = d100 ? Mp3.play(Folders.hundreds, d100) : done;
+  const digit = female && d1 < 3 ? d1 + 100 : d1;
   return p100
     .then(() => (d10 ? Mp3.play(Folders.tens, d10 * 10) : done))
-    .then(() => (d1 ? Mp3.play(Folders.smallNumbers, d1) : done));
+    .then(() => (d1 ? Mp3.play(Folders.smallNumbers, digit) : done));
 };
 
 const numberScenario = (n: number) => {
@@ -41,9 +42,9 @@ const numberScenario = (n: number) => {
   };
 };
 
-export const sayNumber = (n: number) => {
+export const sayNumber = (n: number, female?: boolean) => {
   const s = numberScenario(n);
-  return sayTripleDigits(s.digits);
+  return sayTripleDigits(s.digits, female);
 };
 
 export const sayPhraze = (p: Phrazes) => Mp3.play(Folders.phrazes, p);
