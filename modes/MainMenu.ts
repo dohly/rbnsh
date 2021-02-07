@@ -4,7 +4,6 @@ import { Menu } from "./Menu";
 import { Handle } from "./Handle";
 import { startUp, Timer, pause, stop } from "./Timer";
 import { Marsohod } from "./Marsohod";
-import { mp3 } from "../drivers/MP3";
 
 export const MainMenu = Menu([
   [
@@ -33,18 +32,18 @@ export const MainMenu = Menu([
     () => {
       Handle({
         [KEY_CODES.LEFT]: () => {
-          mp3
-            .play(200)
-            .then(() => mp3.play(1003))
-            .then(() => mp3.play(300))
-            .then(() => mp3.play(40))
-            .then(() => mp3.play(5));
+          Hardware.mp3
+            .play(1, 1)
+            .then(() => Hardware.mp3.play(1, 2))
+            .then(() => Hardware.mp3.play(2, 1))
+            .then(() => Hardware.mp3.play(2, 2))
+            .then(() => Hardware.mp3.play(2, 3));
         },
-        [KEY_CODES.RIGHT]: () => mp3.playPrevious(),
-        [KEY_CODES.TOP]: () => mp3.increaseVolume(),
-        [KEY_CODES.BOTTOM]: () => mp3.decreaseVolume(),
+        [KEY_CODES.RIGHT]: () => Hardware.mp3.playPrevious(),
+        [KEY_CODES.TOP]: () => Hardware.mp3.increaseVolume(),
+        [KEY_CODES.BOTTOM]: () => Hardware.mp3.decreaseVolume(),
         [KEY_CODES.CROSS]: () => {
-          mp3.pause();
+          Hardware.mp3.pause();
           MainMenu();
         },
       });
