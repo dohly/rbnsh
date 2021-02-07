@@ -15,7 +15,7 @@ const HardwareInit = () => {
       .then(() => mp3.play(2))
       .then(() => mp3.play(3))
       .then(() => mp3.play(5));
-  }, 1000);
+  }, 2000);
 
   PrimaryI2C.setup({ sda: SDA, scl: SCL });
   const oled = connectDisplay(PrimaryI2C, () =>
