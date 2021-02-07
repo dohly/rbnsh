@@ -11,11 +11,11 @@ const HardwareInit = () => {
   setTimeout(() => {
     mp3.setGain(1);
     mp3
-      .play(1)
-      .then(() => mp3.play(2))
-      .then(() => mp3.play(3))
-      .then(() => mp3.play(5));
-  }, 2000);
+      .play(101)
+      .then(() => mp3.play(102))
+      .then(() => mp3.play(103))
+      .then(() => mp3.play(105));
+  }, 3000);
 
   PrimaryI2C.setup({ sda: SDA, scl: SCL });
   const oled = connectDisplay(PrimaryI2C, () =>

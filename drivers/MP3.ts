@@ -81,11 +81,12 @@ serial.on("data", (data) => {
       );
     buffer = buffer.slice(10);
     const byte1 = parseByte(packet[3]);
-    console.log(
-      `Returned: 0x${byte1} Parameter: 0x${parseByte(packet[5])}, 0x${parseByte(
-        packet[6]
-      )}`
-    );
+    console.log("resp", packet.join(" "));
+    // console.log(
+    //   `Returned: 0x${byte1} Parameter: 0x${parseByte(packet[5])}, 0x${parseByte(
+    //     packet[6]
+    //   )}`
+    // );
     if (packet[3] == "3D" && !mp3timer) {
       mp3timer = setTimeout(() => {
         HardwareEvents.mp3Played.publish(packet[6]);
@@ -123,7 +124,25 @@ const run = (command: Command, value: number = 0) => {
     getLowByte(checksum),
     END_BYTE,
   ];
-  console.log(payload);
+  console.log("req", payload.map((x) => x.toString(16)).join(" "));
+  serial.write(payload);
+};
+
+const runCmd = (command: Command, p1: number, p2: number, ack) => {
+  const checksum = getChecksum(command, p1, p2);
+  const payload = [
+    START_BYTE,
+    VERSION_BYTE,
+    DATA_LENGTH,
+    command,
+    ack,
+    p1,
+    p2,
+    getHighByte(checksum),
+    getLowByte(checksum),
+    END_BYTE,
+  ];
+  console.log("req", payload.map((x) => x.toString(16)).join(" "));
   serial.write(payload);
 };
 const between = (v: number, min: number, max: number) =>
@@ -172,6 +191,7 @@ export const mp3 = {
   pause: () => run(Command.Pause),
   setPlaybackFolder: (folder: number) =>
     run(Command.SetFolder, between(folder, 1, 10)),
+  playFolder: (f, t) => runCmd(Command.SetFolder, f, t, 0),
   setGain: (gain: number) => {
     const g = Math.max(0, Math.min(31, gain));
     run(Command.SetGain, g);

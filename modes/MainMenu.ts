@@ -32,7 +32,14 @@ export const MainMenu = Menu([
     "music",
     () => {
       Handle({
-        [KEY_CODES.LEFT]: () => mp3.playNext(),
+        [KEY_CODES.LEFT]: () => {
+          mp3
+            .play(200)
+            .then(() => mp3.play(1003))
+            .then(() => mp3.play(300))
+            .then(() => mp3.play(40))
+            .then(() => mp3.play(5));
+        },
         [KEY_CODES.RIGHT]: () => mp3.playPrevious(),
         [KEY_CODES.TOP]: () => mp3.increaseVolume(),
         [KEY_CODES.BOTTOM]: () => mp3.decreaseVolume(),

@@ -6,7 +6,6 @@ export class EventStream<TEvent> {
   public subscribe = (s: Subscription<TEvent>) => this.subscribers.push(s);
   public once = (s: Subscription<TEvent>) => {
     const wrapper = (x: TEvent) => {
-      console.log("wrapper " + x);
       s(x);
       this.unsubscribe(wrapper);
     };
