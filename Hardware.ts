@@ -21,7 +21,7 @@ const HardwareInit = () => {
   IR_Receiver(P3, (code) => HardwareEvents.irCodes.publish(code));
   let leftWheel = BuildWheel(M2, leftEncoder, false);
   let rightWheel = BuildWheel(M1, rightEncoder, true);
-  let mp3 = new DFPlayer(P1, P0, P2, PrimarySerial);
+  let mp3 = new DFPlayer(P1, P0, P2, PrimarySerial, P9);
   return {
     head: BuildServo(P8, 90),
     leftWheel,

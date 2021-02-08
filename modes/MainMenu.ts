@@ -31,9 +31,16 @@ export const MainMenu = Menu([
   [
     "music",
     () => {
+      let number = 1;
       Handle({
-        [KEY_CODES.LEFT]: () => Hardware.mp3.playNext(),
-        [KEY_CODES.RIGHT]: () => Hardware.mp3.playPrevious(),
+        [KEY_CODES.LEFT]: () => {
+          sayNumber(number);
+          number--;
+        },
+        [KEY_CODES.RIGHT]: () => {
+          sayNumber(number);
+          number++;
+        },
         [KEY_CODES.TOP]: () => Hardware.mp3.increaseVolume(),
         [KEY_CODES.BOTTOM]: () => Hardware.mp3.decreaseVolume(),
         [KEY_CODES.CROSS]: () => {
