@@ -32,15 +32,22 @@ export const MainMenu = Menu([
     "music",
     () => {
       let number = 1;
+      const drawNumber = () => {
+        Hardware.oled.clear();
+        Hardware.oled.drawString(number, 0, 10);
+        Hardware.oled.flip();
+      };
+      const sayN = () => sayNumber(number);
+      drawNumber();
       Handle({
-        [KEY_CODES.LEFT]: () => {
-          sayNumber(number);
-          number--;
-        },
-        [KEY_CODES.RIGHT]: () => {
-          sayNumber(number);
-          number++;
-        },
+        [KEY_CODES.LEFT]: () =>
+          sayN()
+            .then(() => number--)
+            .then(drawNumber),
+        [KEY_CODES.RIGHT]: () =>
+          sayN()
+            .then(() => number++)
+            .then(drawNumber),
         [KEY_CODES.TOP]: () => Hardware.mp3.increaseVolume(),
         [KEY_CODES.BOTTOM]: () => Hardware.mp3.decreaseVolume(),
         [KEY_CODES.CROSS]: () => {
