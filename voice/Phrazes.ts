@@ -7,5 +7,7 @@ export enum Phrazes {
     Very,
     Good,
     Bad,
-    BeFaster
+    BeFaster,
+    HappyBirthday,
+    Serega
 }

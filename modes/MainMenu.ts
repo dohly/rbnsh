@@ -1,10 +1,12 @@
 import { KEY_CODES } from "../drivers/IR_Receiver";
-import { Hardware } from "../Hardware";
+import { Hardware, oled } from "../Hardware";
 import { Menu } from "./Menu";
 import { Handle } from "./Handle";
 import { startUp, Timer, pause, stop } from "./Timer";
 import { Marsohod } from "./Marsohod";
-import { sayNumber } from "../voice/Say";
+import { sayNumber, sayPhraze } from "../voice/Say";
+import { Phrazes } from "../voice/Phrazes";
+import { Smile } from "../Images";
 
 export const MainMenu = Menu([
   [
@@ -29,7 +31,19 @@ export const MainMenu = Menu([
   ],
   ["Marsohod", Marsohod],
   [
-    "music",
+    "Pozdravit",
+    () => {
+      Handle({ [KEY_CODES.CROSS]: MainMenu });
+      oled.clear();
+      oled.setFontVector(15);
+      oled.drawImage(Smile, 0, 0);
+      oled.flip();
+
+      sayPhraze(Phrazes.Sofia).then(() => sayPhraze(Phrazes.HappyBirthday));
+    },
+  ],
+  [
+    "1, 2, 3..",
     () => {
       let number = 1;
       const drawNumber = () => {
