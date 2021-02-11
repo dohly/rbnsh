@@ -77,7 +77,7 @@ export class DFPlayer {
             (256 + x.charCodeAt(0)).toString(16).substr(-2).toUpperCase()
           );
         buffer = buffer.slice(10);
-        //console.log("resp", packet.join(" "));
+        console.log("resp", packet.join(" "));
       }
     });
     setTimeout(() => serial.write(instruction(Command.Init, true, 0, 0)), 3000);
