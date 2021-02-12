@@ -1,6 +1,6 @@
-const Corellation = (values1: number[], values2: number[]) => {
+export const Corellation = (values1: Uint8Array, values2: Uint8Array) => {
   let total = values1.length;
-  const avg = (arr: number[]) => E.sum(arr) / arr.length;
+  const avg = (arr: Uint8Array) => E.sum(arr) / arr.length;
   let values1_average = avg(values1);
   let values2_average = avg(values2);
 
@@ -29,7 +29,7 @@ const Corellation = (values1: number[], values2: number[]) => {
   sx = Math.sqrt(sx);
   sy = Math.sqrt(sy);
 
-  var correlation = (sum_values_average / (n * sx * sy)).toFixed(9);
+  var correlation = sum_values_average / (n * sx * sy);
 
-  return parseFloat(correlation);
+  return correlation;
 };
