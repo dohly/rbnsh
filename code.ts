@@ -15,26 +15,45 @@ setTimeout(() =>
   //   .then(() => sayPhraze(Phrazes.MainQuestion))
   //   .then(StartMenu),
   {
-    const size = 2048;
+    const size = 128;
     var w = new Waveform(size, { doubleBuffer: true });
     var SAMPLERATE = 2000; /* Hz */
     var data = new Uint8Array(size);
     var original: Uint8Array = null;
-    w.on("finish", (buf) => {
+    // w.on("finish", (buf) => {
+    //   oled.clear();
+    //   data.set(buf);
+    //   E.FFT(data);
+    //   if (!original) {
+    //     original = new Uint8Array(data);
+    //     oled.drawString("recorded", 0, 0);
+    //   } else {
+    //     var diff = E.convolve(original, data, 0);
+    //     oled.drawString(diff, 0, 0);
+    //   }
+    //   //oled.moveTo(0, 32);
+    //   //data.forEach((y, x) => oled.lineTo(x, y / 4));
+    //   oled.flip();
+    //   listening = false;
+    // });
+    w.on("buffer", (buf) => {
       oled.clear();
       data.set(buf);
-      E.FFT(data);
-      if (!original) {
-        original = new Uint8Array(data);
-        oled.drawString("recorded", 0, 0);
-      } else {
-        var diff = Corellation(original, data);
-        oled.drawString(diff, 0, 0);
-      }
-      //oled.moveTo(0, 32);
-      //data.forEach((y, x) => oled.lineTo(x, y / 4));
+      oled.moveTo(0, 32);
+      data.forEach((y, x) => oled.lineTo(x, y / 4));
+      var l = data.length;
+      E.FFT(data);      
+      var v = E.variance(data, E.sum(data) / l) / l / 4;
+      oled.drawString(
+        "............................................................".substr(
+          0,
+          v
+        ),
+        0,
+        40
+      );
       oled.flip();
-      listening = false;
+      //listening = false;
     });
     let listening = false;
     Handle({
@@ -42,9 +61,11 @@ setTimeout(() =>
         if (!listening) {
           listening = true;
           oled.setFontVector(15);
+          oled.clear();
+
           oled.drawString("Started", 0, 0);
           oled.flip();
-          w.startInput(A2, SAMPLERATE, { repeat: false });
+          w.startInput(A2, SAMPLERATE, { repeat: true });
         }
       },
       [KEY_CODES.CROSS]: () => {
