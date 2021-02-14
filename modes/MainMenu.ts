@@ -7,6 +7,7 @@ import { Marsohod } from "./Marsohod";
 import { sayNumber, sayPhraze } from "../voice/Say";
 import { Phrazes } from "../voice/Phrazes";
 import { Smile } from "../Images";
+import { Oscilloscope } from "../Oscilloscope";
 
 export const MainMenu = Menu([
   [
@@ -29,6 +30,7 @@ export const MainMenu = Menu([
       );
     },
   ],
+  ["Listen", Oscilloscope],
   ["Marsohod", Marsohod],
   [
     "Pozdravit",
