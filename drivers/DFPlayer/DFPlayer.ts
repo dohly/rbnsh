@@ -80,6 +80,7 @@ export class DFPlayer {
         //console.log("resp", packet.join(" "));
       }
     });
+    this.volume(9);  
     setTimeout(() => serial.write(instruction(Command.Init, true, 0, 0)), 3000);
   }
 
