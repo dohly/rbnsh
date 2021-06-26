@@ -5,7 +5,7 @@ import { Units } from "../voice/Units";
 
 export const Timer = new EventStream<string>();
 let seconds = 0;
-let minutes = 0;
+let minutes = 10;
 let t_interval;
 let started = false;
 
@@ -39,7 +39,7 @@ export const startUp = () =>
     if (!t_interval) {
       started = false;
       t_interval = setInterval(() => {
-        tick(1);
+        tick(-1);
         if (!started) {
           started = true;
           resolve();
